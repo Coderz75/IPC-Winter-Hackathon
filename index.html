@@ -4,15 +4,27 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <title>replit</title>
+  <title>Cool game</title>
   <link href="style/style.css" rel="stylesheet" type="text/css" />
 </head>
 
-<body>
-  Hello world
+<body onload="setup()">
+  <div id = "welcome">
+    <h1 class="welcome-header">Awesome cool Game Title Name</h1>
+    <button class = "start-button" id="start-button" onclick="start();">Start</button>
+  </div>
+  <div id = "game">
+    <ul>
+      <li><button class = "gameButton" onclick = "location.reload();">Menu</button></li>
+      <li><button class = "gameButton" onclick = 'document.getElementById("info").style.display = "block"'>Info</button></li>
+      <li>
+    </ul>
+    <div id = "info">
+      <h1>INFO</h1>
+      <p1>Hesdfdsfdsdsjdskaldjlkdsjlfdkjlfksdajadlksjfdlsjdlsjdsjlsa;dkjdfslkjasl;kjfdlsk;ajfdlsjldsajldsjljfdsaljldsjsldllo</p1>
+    </div>
+  </div>
   <script src="scripts/script.js"></script>
-
-  
 </body>
 
 </html>
