@@ -65,15 +65,19 @@ li button:hover {
     width: 70vw;
     left: 15vw;
 }
-#info h1{
+#info-title{
     text-align: center;
     background: rgba(9, 9, 121, 0.781);
-background: radial-gradient(circle, rgba(9, 9, 121, 0.466) 50%, rgb(2, 0, 36) 91%);
+    background: radial-gradient(circle, rgba(9, 9, 121, 0.466) 50%, rgb(2, 0, 36) 91%);
     border-bottom: 1px;
     border-style: double;
     border-color: white;
     border-radius: 25px 25px 0 0; 
     padding: 1%;
+    display: inline-block;
+}
+#info-close{
+    text-align: left;
 }
 #info p1{
     position: relative;
