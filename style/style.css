@@ -86,3 +86,19 @@ li button:hover {
     padding: 2vw;
     height: 50vh;
 }
+
+#game-info{
+    position: absolute;
+    top:0;
+    left:0;
+    margin:0
+}
+
+/* Styling canvas */
+
+#game-canvas{
+    width: 100vw;
+    height: 100vh;
+    outline: 0;
+    
+}
