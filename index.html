@@ -20,33 +20,44 @@
       </canvas>
     </div>
     <ul>
-      <li><button class = "gameButton" onclick = "location.reload();">Menu</button></li>
-      <li><button class = "gameButton" onclick = 'document.getElementById("info").style.display = "inline-block"'>Info</button></li>
-      <li><button class = "gameButton" onclick = 'document.getElementById("help").style.display = "inline-block"'>Help</button></li>
+      
+      <li><button class = "gameButton" onclick = 'outside.openInfo()'>Info</button></li>
+      <li><button class = "gameButton" onclick = 'outside.openLifeline()'>Lifeline</button></li>
+      <li><button class = "gameButton" onclick = 'outside.openHelp()'>Help</button></li>
     </ul>
     <div class = "panel" id = "info">
       <div class = "panel-title" id = "info-title">
         <h1>INFO</h1>
-        <button class = "panel-close" id = "info-close" onclick='document.getElementById("info").style.display = "none"'><h2>X</h2></button>
+        <button class = "panel-close" id = "info-close" onclick='outside.closeInfo()'><h2>X</h2></button>
       </div>
       <div class = "panel-text" id = "info-text">
         <p1>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque purus semper eget duis at tellus at urna. Placerat vestibulum lectus mauris ultrices eros in cursus turpis. Scelerisque fermentum dui faucibus in ornare quam. Ullamcorper a lacus vestibulum sed arcu non odio euismod. Quis ipsum suspendisse ultrices gravida dictum fusce ut placerat. Libero volutpat sed cras ornare. Interdum varius sit amet mattis vulputate enim nulla. Facilisi etiam dignissim diam quis enim lobortis scelerisque fermentum. Bibendum arcu vitae elementum curabitur vitae nunc. Eu sem integer vitae justo. Ullamcorper morbi tincidunt ornare massa eget egestas purus.</p1>
       </div>
       <div id = "info-card">
-        <h1>Data</h1>
-        <img src = "assets/question_mark.png" alt = "No picture in database">
+        <h1 id = "info-card-title">Data</h1>
+        <img id = "info-card-img" src = "assets/question_mark.png" alt = "No picture in database">
         <h2>Unknown</h2>
+        <p1 id = "info-card-info">Data become available on day 4</p1>
       </div>
     </div>
     <div class = "panel" id = "help">
       <div class = "panel-title" id = "help-title">
         <h1>HELP</h1>
-        <button class = "panel-close" id = "help-close" onclick='document.getElementById("help").style.display = "none"'><h2>X</h2></button>
+        <button class = "panel-close" id = "help-close" onclick='outside.closeHelp()'><h2>X</h2></button>
       </div>
       <div class = "panel-text" id = "help-text">
         <p1>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque purus semper eget duis at tellus at urna. Placerat vestibulum lectus mauris ultrices eros in cursus turpis. Scelerisque fermentum dui faucibus in ornare quam. Ullamcorper a lacus vestibulum sed arcu non odio euismod. Quis ipsum suspendisse ultrices gravida dictum fusce ut placerat. Libero volutpat sed cras ornare. Interdum varius sit amet mattis vulputate enim nulla. Facilisi etiam dignissim diam quis enim lobortis scelerisque fermentum. Bibendum arcu vitae elementum curabitur vitae nunc. Eu sem integer vitae justo. Ullamcorper morbi tincidunt ornare massa eget egestas purus.</p1>
       </div>
-      
+    </div>
+
+    <div class = "panel" id = "lifeline">
+      <div class = "panel-title" id = "lifeline-title">
+        <h1>Lifeline</h1>
+        <button class = "panel-close" id = "lifeline-close" onclick='outside.closeLifeline()'><h2>X</h2></button>
+      </div>
+      <div class = "panel-text" id = "lifeline-text">
+        <p1>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque purus semper eget duis at tellus at urna. Placerat vestibulum lectus mauris ultrices eros in cursus turpis. Scelerisque fermentum dui faucibus in ornare quam. Ullamcorper a lacus vestibulum sed arcu non odio euismod. Quis ipsum suspendisse ultrices gravida dictum fusce ut placerat. Libero volutpat sed cras ornare. Interdum varius sit amet mattis vulputate enim nulla. Facilisi etiam dignissim diam quis enim lobortis scelerisque fermentum. Bibendum arcu vitae elementum curabitur vitae nunc. Eu sem integer vitae justo. Ullamcorper morbi tincidunt ornare massa eget egestas purus.</p1>
+      </div>
     </div>
   </div>
   <script src="scripts/script.js"></script>

@@ -90,6 +90,11 @@
     font-family: "Monaco", "Courier New", monospace;
 }
 
+#info-card p1{
+    text-align: center;
+    width: inherit;
+}
+
 #info-card img{
     width:25vw;
     margin-left: auto;
