@@ -1,4 +1,4 @@
-#info{
+.panel{
     position: relative;
     background-color: black;
     color: white;
@@ -10,7 +10,7 @@
     background: rgba(9, 9, 121, 0.781);
     background: radial-gradient(circle, rgb(1, 1, 107) 40%, rgb(2, 0, 36) 100%);
 }
-#info-title{
+.panel-title{
     text-align: center;
     background: rgba(9, 9, 121, 0.459);
     background: radial-gradient(circle, rgb(9, 9, 121) 1%, rgb(2, 0, 36) 50%);
@@ -21,10 +21,10 @@
     padding: 1%;
 
 }
-#info h1{
+.panel h1{
     display: inline-block;
 }
-#info-close{
+.panel-close{
     float: right;
     background-color: rgb(0, 0, 0);
     outline: 2px inset white;
@@ -35,7 +35,7 @@
     padding-right: 3%;
 }
 
-#info-close:hover{
+.panel-close:hover{
     animation-name: expand;
     animation-duration: 0.1s;
     animation-iteration-count: 1;
@@ -48,38 +48,30 @@
     to  {outline-width: 5px;}
 }
 
-#info-text{
+
+.panel-text{
+    position: relative;
+    overflow-wrap:normal;
+    height: 50vh;
+    font-family: "Monaco", "Courier New", monospace;
     padding: 5px;
 }
-
-#info p1{
-    position: relative;
-    overflow-wrap: break-word;
-    width: 55vw;
-    height: 50vh;
-}
 #info-text{
-    width: 45vw;
+    width: 40vw;
 }
 
-#game-info{
-    position: absolute;
-    top:0;
-    left:0;
-    margin:0
-}
 
-#card{
-    float:right;
+#info-card{
+    position: fixed !important;
     background-color: gray;
     width:25vw;
     height: 45vh;
     border-radius: 20px;
-    position: absolute;
-    left: 45vw;
+    top:28vh;
+    left: 60vw;
 }
 
-#card h1{
+#info-card h1{
     width: inherit;
     border-top-right-radius: inherit;
     border-top-left-radius: inherit;
@@ -88,7 +80,7 @@
     background-color: rgba(0, 0, 0, 0.664);
     font-family: "Monaco", "Courier New", monospace;
 }
-#card h2{
+#info-card h2{
     width: inherit;
     border-radius: inherit;
     margin: 0;
@@ -96,4 +88,10 @@
     text-align: center;
     background-color: rgba(0, 0, 0, 0.664);
     font-family: "Monaco", "Courier New", monospace;
+}
+
+#info-card img{
+    width:25vw;
+    margin-left: auto;
+    margin-right: auto;
 }

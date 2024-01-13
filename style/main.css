@@ -34,9 +34,12 @@ li{
 li button{
     color: white;
     text-align: center;
-    padding: 2vh 20vw;
+    padding: 2vh 0;
+    margin: 0;
     text-decoration: none;
     background-color: black;
+    width:auto;
+    width:33vw;
 }
   
   /* Change the link color to #111 (black) on hover */
