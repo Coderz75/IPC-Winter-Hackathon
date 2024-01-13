@@ -5,7 +5,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <title>Cool game</title>
-  <link href="style/style.css" rel="stylesheet" type="text/css" />
+  <link href="style/main.css" rel="stylesheet" type="text/css" />
+  <link href="style/panels.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body onload="setup()">
@@ -16,15 +17,21 @@
   <div id = "game">
     <ul>
       <li><button class = "gameButton" onclick = "location.reload();">Menu</button></li>
-      <li><button class = "gameButton" onclick = 'document.getElementById("info").style.display = "block"'>Info</button></li>
+      <li><button class = "gameButton" onclick = 'document.getElementById("info").style.display = "inline-block"'>Info</button></li>
       <li>
     </ul>
     <div id = "info">
       <div id = "info-title">
         <h1>INFO</h1>
-        <h1 id = "info-close" onclick='document.getElementById("info").style.display = "none"'>X</h1>
+        <button id = "info-close" onclick='document.getElementById("info").style.display = "none"'><h2>X</h2></button>
       </div>
-      <p1>Hesdfdsfdsdsjdskaldjlkdsjlfdkjlfksdajadlksjfdlsjdlsjdsjlsa;dkjdfslkjasl;kjfdlsk;ajfdlsjldsajldsjljfdsaljldsjsldllo</p1>
+      <div id = "info-text">
+        <p1>Hesdfdsfdsdsjdskaldjlkdsjlfdkjlfksdajadlksjfdlsjdlsjdsjlsa;dkjdfslkjasl;kjfdlsk;ajfdlsjldsajldsjljfdsaljldsjsldllo</p1>
+      </div>
+      <div id = "card">
+        <h1>Data</h1>
+        <h2>Data</h2>
+      </div>
     </div>
     <div id = "game-window">
       <canvas id="game-canvas" width="200" height="100">
