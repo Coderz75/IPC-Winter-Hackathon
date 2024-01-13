@@ -15,6 +15,10 @@
     <button class = "start-button" id="start-button" onclick="start();">Start</button>
   </div>
   <div id = "game">
+    <div id = "game-window">
+      <canvas id="game-canvas" width="200" height="100">
+      </canvas>
+    </div>
     <ul>
       <li><button class = "gameButton" onclick = "location.reload();">Menu</button></li>
       <li><button class = "gameButton" onclick = 'document.getElementById("info").style.display = "inline-block"'>Info</button></li>
@@ -33,10 +37,7 @@
         <h2>Data</h2>
       </div>
     </div>
-    <div id = "game-window">
-      <canvas id="game-canvas" width="200" height="100">
-      </canvas>
-    </div>
+    
   </div>
   <script src="scripts/script.js"></script>
 </body>
