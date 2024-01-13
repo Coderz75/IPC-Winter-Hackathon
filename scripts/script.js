@@ -8,6 +8,10 @@ function setup(){
     for(var i = 0; i < panels.length; i++) {
         panels[i].style.display = "none";
     }
+    var hides = document.getElementsByClassName("hide");
+    for(var i = 0; i < hides.length; i++) {
+        hides[i].style.display = "none";
+    }
 }
 
 function start(){
@@ -102,8 +106,134 @@ function OutsideWorldBody(){
     }
 }
 
+function GameCanvasBody(){
+    this.canvas = document.getElementById("game-canvas");
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
+    this.canvas.width = this.width;
+    this.canvas.height = this.height;
+    this.context = this.canvas.getContext("2d");
+    this.canvas.onmousemove = updatemouse;
+    this.canvas.onmousedown = mouse_click;
+    this.canvas.onmouseup = mouse_up;
+    this.keys = [];
+
+    this.mx = 0;
+    this.my = 0;
+    this.mouseDown = false;
+
+    this.canvas.style.cursor = 'none';
+    window.addEventListener('keydown', function (e) {
+        canvas.keys = (canvas.keys || []);
+        canvas.keys[e.keyCode] = true;
+      })
+    window.addEventListener('keyup', function (e) {
+        canvas.keys[e.keyCode] = false;
+    })
+    this.clear = function() {
+        this.width = window.innerWidth;
+        this.height = window.innerHeight;
+        this.canvas.width = this.width;
+        this.canvas.height = this.height;
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+}
+function mouse_click(event){
+    canvas.mouseDown = true;
+    
+}
+function mouse_up (event){
+    canvas.mouseDown = false;
+}
+function updatemouse(event){
+    canvas.mx = event.clientX;
+    canvas.my = event.clientY;
+}
+
+function player_data(){
+    this.x = 0;
+    this.y = 0;
+    this.dir = 0;
+    this.size = 100;
+    this.speedX = 0;
+    this.speedY = 0;
+    this.speed = 2;
+
+    this.update = function(){
+        this.dir = Math.atan2(canvas.my - this.y, canvas.mx - this.x) - (2*Math.PI)/4
+        this.dir %= 2*Math.PI
+
+        //A
+        if (canvas.keys && (canvas.keys[37] || canvas.keys[65])) {player.speedX -= this.speed; }
+        //W
+        if (canvas.keys && (canvas.keys[39] || canvas.keys[68])) {player.speedX += this.speed; }
+        //W
+        if (canvas.keys && (canvas.keys[38] || canvas.keys[87])) {player.speedY -= this.speed; }
+        //S
+        if (canvas.keys && (canvas.keys[40] || canvas.keys[83])) {player.speedY += this.speed; }
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        if(this.speedX > 0 ){
+            this.speedX -= 1;
+        }else if(this.speedX < 0){
+            this.speedX +=1;
+        }
+
+        if(this.speedX > 10){
+            this.speedX = 10;
+        }else if(this.speedX < -10){
+            this.speedX = -10;
+        }
+
+        if(this.speedY > 0 ){
+            this.speedY -= 1;
+        }else if(this.speedY < 0){
+            this.speedY +=1;
+        }
+
+        if(this.speedY > 10){
+            this.speedY = 10;
+        }else if(this.speedY < -10){
+            this.speedY = -10;
+        }
+
+    };
+    this.draw = function(){
+        let image = document.getElementById("charachter-image");
+
+        canvas.context.save();
+
+        // move to pos
+        canvas.context.translate(this.x,this.y);
+
+        //rotate image
+        canvas.context.rotate(this.dir);
+
+        
+        canvas.context.drawImage(image,-this.size/2,-this.size/2,this.size,this.size);
+
+        // restore
+        canvas.context.restore();
+    };
+}
+
 var outside = new OutsideWorldBody();
+var canvas = new GameCanvasBody();
+var player = new player_data();
 
 function tick(){
     outside.update();
+    player.update();
+    canvas.clear();
+    player.draw();
+    
+    //mouse
+    let ctx = canvas.context;
+    ctx.beginPath();
+    ctx.moveTo(canvas.mx, canvas.my - 50);
+    ctx.lineTo(canvas.mx, canvas.my + 50);
+    ctx.moveTo(canvas.mx - 50, canvas.my);
+    ctx.lineTo(canvas.mx + 50, canvas.my);
+    ctx.stroke();
 }
