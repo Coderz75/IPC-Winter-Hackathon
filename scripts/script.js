@@ -112,7 +112,7 @@ function GameCanvasBody(){
     this.height = window.innerHeight;
     this.canvas.width = this.width;
     this.canvas.height = this.height;
-    this.context = this.canvas.getContext("2d");
+    this.context = this.canvas.getContext("2d",{ willReadFrequently: true });
     this.canvas.onmousemove = updatemouse;
     this.canvas.onmousedown = mouse_click;
     this.canvas.onmouseup = mouse_up;
@@ -162,21 +162,39 @@ function updatemouse(event){
     canvas.my = event.clientY;
 }
 
-function acid(dir, damage = 1, speed = 10) {
+function acid(dir, damage = 1, speed = 5) {
     this.x = player.x;
     this.y = player.y;
     this.dir = dir;
     this.damage = damage;
-    this.width = 10;
+    this.width = 2;
     this.tick = 0;
     this.speed = speed;
     
     this.update = function(){
         this.tick += 1;
-        if(this.tick >= 50){
+        if(this.tick >= 100){
             player.acids.splice(player.acids.indexOf(this), 1);
             return;
         }
+
+        //collisions script
+        let i = this.dir;
+        //for(let i = 0; i < 2*Math.PI;i+=0.1){
+            let pointX = Math.round(this.x - Math.sin(i)*(this.width+1));
+            let pointY = Math.round(this.y+ Math.cos(i)*(this.width+1));
+            const pointData = canvas.context.getImageData(pointX-canvas.scrollx, pointY-canvas.scrolly , 1, 1);
+            //console.log(pointData);
+            if(
+                pointData.data[0]>=60&&
+                pointData.data[1]==0&&
+                pointData.data[2]==0
+            ){
+                player.acids.splice(player.acids.indexOf(this), 1);
+                return;
+            }
+        //}
+
         this.x += Math.sin(this.dir) * -this.speed;
         this.y += Math.cos(this.dir) * this.speed;
     };
@@ -187,8 +205,6 @@ function acid(dir, damage = 1, speed = 10) {
         context.arc(this.x-canvas.scrollx, this.y-canvas.scrolly, this.width, 0, 2 * Math.PI, false);
         context.fillStyle = 'black';
         context.fill();
-        context.lineWidth = 5;
-        context.strokeStyle = '#003300';
         context.stroke();
     };
 
@@ -251,6 +267,8 @@ function player_data(){
         }
 
         if (canvas.mouseDown && this.reload == 0){
+            //const pointData = canvas.context.getImageData(canvas.mx, canvas.my , 1, 1);
+            //console.log(pointData);
             for(let i = -1; i < 1;i+=0.1){
                 this.acids.push(new acid(this.dir+i));
             }
@@ -264,6 +282,7 @@ function player_data(){
         }
 
         //update canvas
+
         canvas.scrollx += (this.x)/10
         canvas.scrolly += (this.y)/10
 
