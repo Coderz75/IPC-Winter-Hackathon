@@ -231,6 +231,9 @@ function player_data(){
         this.dir = Math.atan2(canvas.my - this.y+canvas.scrolly, canvas.mx - this.x+canvas.scrollx) - (2*Math.PI)/4
         this.dir %= 2*Math.PI
 
+        let oldx = this.x;
+        let oldy = this.y;
+
         //A
         if (canvas.keys && (canvas.keys[37] || canvas.keys[65])) {player.speedX -= this.speed; }
         //W
@@ -239,9 +242,10 @@ function player_data(){
         if (canvas.keys && (canvas.keys[38] || canvas.keys[87])) {player.speedY -= this.speed; }
         //S
         if (canvas.keys && (canvas.keys[40] || canvas.keys[83])) {player.speedY += this.speed; }
+
         this.x += this.speedX;
         this.y += this.speedY;
-
+        
         if(this.speedX > 0 ){
             this.speedX -= 1;
         }else if(this.speedX < 0){
@@ -265,7 +269,51 @@ function player_data(){
         }else if(this.speedY < -this.maxSpeed){
             this.speedY = -this.maxSpeed;
         }
+        
+        
+        if(this.checkCollisions(this.x,this.y)){
+            let newX = this.x;
+            let newY = this.y;
+            
+            let match = false;
+            if(Math.abs(this.speedX) > Math.abs(this.speedY)){
+                //fidget y
+                for(let i = 1; i < 12; i++){
+                    if(!this.checkCollisions(newX,newY+i)){
+                        this.y = newY + i;
+                        match = true;
+                        break;
+                    }else if(!this.checkCollisions(newX,newY-i)){
+                        this.y = newY - i;
+                        match = true;
+                        break;
+                    }
+                }
+            }else{
+                //fidget x
+                for(let i = 1; i < 12;i++){
+                    if(!this.checkCollisions(newX+i,newY)){
+                        this.x = newX + i;
+                        match = true;
+                        break;
+                    }else if(!this.checkCollisions(newX-i,newY)){
+                        this.x = newX - i;
+                        match = true;
+                        break;
+                    }
+                }
+            }
+            if(!match){
+                this.speedX = 0;
+                this.speedY = 0;
+                this.x = oldx
+                this.y = oldy;
+            }
+        };
+        
 
+
+        //Shoot acids
         if (canvas.mouseDown && this.reload == 0){
             //const pointData = canvas.context.getImageData(canvas.mx, canvas.my , 1, 1);
             //console.log(pointData);
@@ -300,6 +348,25 @@ function player_data(){
             canvas.scrolly = canvas.imgHeight/2-canvas.height;
         }
     };
+
+    this.checkCollisions = function(x,y){
+        //check collisions
+        for(let i = 0; i < 2*Math.PI;i+=0.05){
+            let pointX = Math.round(x - Math.sin(i)*(this.size/2+1));
+            let pointY = Math.round(y+ Math.cos(i)*(this.size/2+1));
+            const pointData = canvas.context.getImageData(pointX-canvas.scrollx, pointY-canvas.scrolly , 1, 1);
+            
+            if(
+                pointData.data[0]>=150&&
+                pointData.data[1]==0&&
+                pointData.data[2]==0
+            ){
+                return true;
+            }
+        }
+        return false;
+    }
+
     this.draw = function(){
         let image = document.getElementById("charachter-image");
 
