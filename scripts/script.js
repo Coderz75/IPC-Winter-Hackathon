@@ -117,10 +117,15 @@ function GameCanvasBody(){
     this.canvas.onmousedown = mouse_click;
     this.canvas.onmouseup = mouse_up;
     this.keys = [];
+    this.level = 1;
+
 
     this.mx = 0;
     this.my = 0;
     this.mouseDown = false;
+    this.scrollx = 0;
+    this.scrolly = 0;
+
 
     this.canvas.style.cursor = 'none';
     window.addEventListener('keydown', function (e) {
@@ -130,12 +135,19 @@ function GameCanvasBody(){
     window.addEventListener('keyup', function (e) {
         canvas.keys[e.keyCode] = false;
     })
+
+
     this.clear = function() {
         this.width = window.innerWidth;
         this.height = window.innerHeight;
         this.canvas.width = this.width;
         this.canvas.height = this.height;
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        let levelImage = document.getElementById("Level1-image");
+        this.imgHeight = levelImage.height*(2000/levelImage.width);
+        canvas.context.drawImage(levelImage,-this.scrollx-2000/2,-this.scrolly-this.imgHeight/2,2000,this.imgHeight);
+        
     }
 }
 function mouse_click(event){
@@ -150,7 +162,7 @@ function updatemouse(event){
     canvas.my = event.clientY;
 }
 
-function acid(dir, damage = 1, speed = 5) {
+function acid(dir, damage = 1, speed = 10) {
     this.x = player.x;
     this.y = player.y;
     this.dir = dir;
@@ -161,7 +173,7 @@ function acid(dir, damage = 1, speed = 5) {
     
     this.update = function(){
         this.tick += 1;
-        if(this.tick >= 100){
+        if(this.tick >= 50){
             player.acids.splice(player.acids.indexOf(this), 1);
             return;
         }
@@ -172,7 +184,7 @@ function acid(dir, damage = 1, speed = 5) {
         let context = canvas.context;
         context.fillStyle = 'black';
         context.beginPath();
-        context.arc(this.x, this.y, this.width, 0, 2 * Math.PI, false);
+        context.arc(this.x-canvas.scrollx, this.y-canvas.scrolly, this.width, 0, 2 * Math.PI, false);
         context.fillStyle = 'black';
         context.fill();
         context.lineWidth = 5;
@@ -183,13 +195,14 @@ function acid(dir, damage = 1, speed = 5) {
 }
 
 function player_data(){
-    this.x = 0;
-    this.y = 0;
+    this.x = -900;
+    this.y = 450;
     this.dir = 0;
     this.size = 100;
     this.speedX = 0;
     this.speedY = 0;
     this.speed = 2;
+    this.maxSpeed = 4;
     this.acids = [];
     this.reload = 0;
     this.reloadTime = 100;
@@ -199,7 +212,7 @@ function player_data(){
             this.reload +=1;
         }
 
-        this.dir = Math.atan2(canvas.my - this.y, canvas.mx - this.x) - (2*Math.PI)/4
+        this.dir = Math.atan2(canvas.my - this.y+canvas.scrolly, canvas.mx - this.x+canvas.scrollx) - (2*Math.PI)/4
         this.dir %= 2*Math.PI
 
         //A
@@ -219,10 +232,10 @@ function player_data(){
             this.speedX +=1;
         }
 
-        if(this.speedX > 10){
-            this.speedX = 10;
-        }else if(this.speedX < -10){
-            this.speedX = -10;
+        if(this.speedX > this.maxSpeed){
+            this.speedX = this.maxSpeed;
+        }else if(this.speedX < -this.maxSpeed){
+            this.speedX = -this.maxSpeed;
         }
 
         if(this.speedY > 0 ){
@@ -231,10 +244,10 @@ function player_data(){
             this.speedY +=1;
         }
 
-        if(this.speedY > 10){
-            this.speedY = 10;
-        }else if(this.speedY < -10){
-            this.speedY = -10;
+        if(this.speedY > this.maxSpeed){
+            this.speedY = this.maxSpeed;
+        }else if(this.speedY < -this.maxSpeed){
+            this.speedY = -this.maxSpeed;
         }
 
         if (canvas.mouseDown && this.reload == 0){
@@ -250,6 +263,23 @@ function player_data(){
             this.acids[i].update();
         }
 
+        //update canvas
+        canvas.scrollx += (this.x)/10
+        canvas.scrolly += (this.y)/10
+
+        if(canvas.scrollx<-1000){
+            canvas.scrollx = -1000;
+        }
+        if(canvas.scrolly<-canvas.imgHeight/2){
+            canvas.scrolly = -canvas.imgHeight/2;
+        }
+        if(canvas.scrollx>-500){
+            canvas.scrollx = -500;
+        }
+
+        if(canvas.scrolly>-200){
+            canvas.scrolly = -200;
+        }
     };
     this.draw = function(){
         let image = document.getElementById("charachter-image");
@@ -257,7 +287,7 @@ function player_data(){
         canvas.context.save();
 
         // move to pos
-        canvas.context.translate(this.x,this.y);
+        canvas.context.translate(this.x-canvas.scrollx,this.y-canvas.scrolly);
 
         //rotate image
         canvas.context.rotate(this.dir);
@@ -293,4 +323,5 @@ function tick(){
     ctx.moveTo(canvas.mx - 50, canvas.my);
     ctx.lineTo(canvas.mx + 50, canvas.my);
     ctx.stroke();
+
 }
