@@ -150,6 +150,38 @@ function updatemouse(event){
     canvas.my = event.clientY;
 }
 
+function acid(dir, damage = 1, speed = 5) {
+    this.x = player.x;
+    this.y = player.y;
+    this.dir = dir;
+    this.damage = damage;
+    this.width = 10;
+    this.tick = 0;
+    this.speed = speed;
+    
+    this.update = function(){
+        this.tick += 1;
+        if(this.tick >= 100){
+            player.acids.splice(player.acids.indexOf(this), 1);
+            return;
+        }
+        this.x += Math.sin(this.dir) * -this.speed;
+        this.y += Math.cos(this.dir) * this.speed;
+    };
+    this.draw = function(){
+        let context = canvas.context;
+        context.fillStyle = 'black';
+        context.beginPath();
+        context.arc(this.x, this.y, this.width, 0, 2 * Math.PI, false);
+        context.fillStyle = 'black';
+        context.fill();
+        context.lineWidth = 5;
+        context.strokeStyle = '#003300';
+        context.stroke();
+    };
+
+}
+
 function player_data(){
     this.x = 0;
     this.y = 0;
@@ -158,8 +190,15 @@ function player_data(){
     this.speedX = 0;
     this.speedY = 0;
     this.speed = 2;
+    this.acids = [];
+    this.reload = 0;
+    this.reloadTime = 100;
 
     this.update = function(){
+        if(this.reload != 0){
+            this.reload +=1;
+        }
+
         this.dir = Math.atan2(canvas.my - this.y, canvas.mx - this.x) - (2*Math.PI)/4
         this.dir %= 2*Math.PI
 
@@ -198,6 +237,19 @@ function player_data(){
             this.speedY = -10;
         }
 
+        if (canvas.mouseDown && this.reload == 0){
+            for(let i = -1; i < 1;i+=0.1){
+                this.acids.push(new acid(this.dir+i));
+            }
+            this.reload = -this.reloadTime;
+            
+        }
+
+        //Update acids;
+        for(let i = 0; i < this.acids.length; i++){
+            this.acids[i].update();
+        }
+
     };
     this.draw = function(){
         let image = document.getElementById("charachter-image");
@@ -215,6 +267,11 @@ function player_data(){
 
         // restore
         canvas.context.restore();
+
+        //Draw acids;
+        for(let i = 0; i < this.acids.length; i++){
+            this.acids[i].draw();
+        }
     };
 }
 
