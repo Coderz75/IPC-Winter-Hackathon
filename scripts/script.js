@@ -283,8 +283,8 @@ function player_data(){
 
         //update canvas
 
-        canvas.scrollx += (this.x)/10
-        canvas.scrolly += (this.y)/10
+        canvas.scrollx += (this.x-(canvas.scrollx+canvas.width/2))/10
+        canvas.scrolly += (this.y-(canvas.scrolly+canvas.height/2))/10
 
         if(canvas.scrollx<-1000){
             canvas.scrollx = -1000;
@@ -292,12 +292,12 @@ function player_data(){
         if(canvas.scrolly<-canvas.imgHeight/2){
             canvas.scrolly = -canvas.imgHeight/2;
         }
-        if(canvas.scrollx>-500){
-            canvas.scrollx = -500;
+        if(canvas.scrollx>1000-canvas.width){
+            canvas.scrollx = 1000-canvas.width;
         }
 
-        if(canvas.scrolly>-200){
-            canvas.scrolly = -200;
+        if(canvas.scrolly>canvas.imgHeight/2-canvas.height){
+            canvas.scrolly = canvas.imgHeight/2-canvas.height;
         }
     };
     this.draw = function(){
