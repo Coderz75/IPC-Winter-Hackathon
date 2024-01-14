@@ -179,8 +179,8 @@ function acid(dir, damage = 1, speed = 5) {
         }
 
         //collisions script
-        let i = this.dir;
-        //for(let i = 0; i < 2*Math.PI;i+=0.1){
+
+        for(let i = 0; i < 2*Math.PI;i+=0.1){
             let pointX = Math.round(this.x - Math.sin(i)*(this.width+1));
             let pointY = Math.round(this.y+ Math.cos(i)*(this.width+1));
             const pointData = canvas.context.getImageData(pointX-canvas.scrollx, pointY-canvas.scrolly , 1, 1);
@@ -193,7 +193,7 @@ function acid(dir, damage = 1, speed = 5) {
                 player.acids.splice(player.acids.indexOf(this), 1);
                 return;
             }
-        //}
+        }
 
         this.x += Math.sin(this.dir) * -this.speed;
         this.y += Math.cos(this.dir) * this.speed;
