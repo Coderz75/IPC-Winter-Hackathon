@@ -14,10 +14,35 @@ function setup(){
     }
 }
 
+var interval;
+var gameTimer;
+var level = 1;
+var gameTimer;
+var levelData ={
+    1:{
+        "type": "Common cold",
+        "Info": "More than 200 viruses can cause the common cold, but rhinoviruses are the most common culprits. It's highly contagious and spreads through touch, airborne droplets from coughs and sneezes, and contaminated surfaces.",
+        "infoImg": "common-cold.png",
+        "img": "common-cold.png",
+        "stats":{
+            "dmg": 10,
+            "health": 10,
+            "speed": 10,
+            "backlash": 1,
+            "size": 10
+        },
+        "amount": 100,
+        "spawn": {
+            "x": 964, 
+            "y": -427.2539682539682
+        }
+    }
+};
+
 function start(){
     document.getElementById("welcome").style.display = "none";
     document.getElementById("game").style.display = "block";
-    var interval = setInterval(tick, 10);
+    interval = setInterval(tick, 10);
 }
 
 function InfoImage(){
@@ -135,7 +160,7 @@ function GameCanvasBody(){
     window.addEventListener('keyup', function (e) {
         canvas.keys[e.keyCode] = false;
     })
-
+    
 
     this.clear = function() {
         this.width = window.innerWidth;
@@ -162,9 +187,94 @@ function updatemouse(event){
     canvas.my = event.clientY;
 }
 
-function acid(dir, damage = 1, speed = 5) {
-    this.x = player.x;
-    this.y = player.y;
+function Pathogen(spawnx,spawny, img, dmg,health,speed,backlash,size, type = "calm"){
+    this.x = spawnx; 
+    this.y= spawny;
+    this.img = img;
+    this.dmg =dmg;
+    this.health=health;
+    this.speed = speed;
+    this.backlash = backlash;
+    this.size = size;
+    this.sx = 0;
+    this.sy = 0;
+    this.dir = 0;
+    this.dirSpeed = 0;
+    this.type = type;
+
+    let fimg = new Image();
+    fimg.src = "assets/pathogens/"+this.img;
+    fimg.id = this.img;
+    fimg.style.display = "none";
+    fimg.class = "hide";
+    document.getElementById('rando').appendChild(fimg);
+
+    this.update =  function(){
+        if(this.type == "calm"){
+            if(this.sx == 0){
+                this.sx = Math.floor(Math.random() * this.speed) * (Math.random() < 0.5 ? -1 : 1);
+            }
+            if(this.sy == 0){
+                this.sy = Math.floor(Math.random()*this.speed) * (Math.random() < 0.5 ? -1 : 1);;
+            }
+            if(this.dirSpeed == 0){
+                this.dirSpeed = Math.random();
+            }
+            let oldx = this.x;
+            let oldy = this.y;
+            this.x += this.sx;
+            this.y += this.sy;
+            this.dir += this.dirSpeed;
+            if(this.checkCollisions(this.x, this.y)){
+                this.x = oldx;
+                this.y = oldy;
+                this.sx = 0;
+                this.sy = 0;
+            }
+        }
+        
+    };
+
+    this.draw = function(){
+        let image = document.getElementById(this.img);
+
+        canvas.context.save();
+
+        // move to pos
+        canvas.context.translate(this.x-canvas.scrollx,this.y-canvas.scrolly);
+
+        //rotate image
+        canvas.context.rotate(this.dir);
+
+        
+        canvas.context.drawImage(image,-this.size/2,-this.size/2,this.size,this.size);
+
+        // restore
+        canvas.context.restore();
+    };
+
+    this.checkCollisions = function(x,y){
+        //check collisions
+        for(let i = 0; i < 2*Math.PI;i+=0.05){
+            let pointX = Math.round(x - Math.sin(i)*(this.size/2+1));
+            let pointY = Math.round(y+ Math.cos(i)*(this.size/2+1));
+            const pointData = canvas.context.getImageData(pointX-canvas.scrollx, pointY-canvas.scrolly , 1, 1);
+            
+            if(
+                pointData.data[0]>=150&&
+                pointData.data[1]==0&&
+                pointData.data[2]==0
+            ){
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+function acid(x,y,dir, damage = 1, speed = 8) {
+    this.x = x;
+    this.y = y;
     this.dir = dir;
     this.damage = damage;
     this.width = 2;
@@ -218,7 +328,7 @@ function player_data(){
     this.speedX = 0;
     this.speedY = 0;
     this.speed = 2;
-    this.maxSpeed = 4;
+    this.maxSpeed = 2;
     this.acids = [];
     this.reload = 0;
     this.reloadTime = 100;
@@ -317,8 +427,9 @@ function player_data(){
         if (canvas.mouseDown && this.reload == 0){
             //const pointData = canvas.context.getImageData(canvas.mx, canvas.my , 1, 1);
             //console.log(pointData);
+            console.log(`Mx: ${canvas.mx} my: ${canvas.my}; Truex: ${canvas.mx + canvas.scrollx} Truey: ${canvas.my + canvas.scrolly}`)
             for(let i = -1; i < 1;i+=0.1){
-                this.acids.push(new acid(this.dir+i));
+                this.acids.push(new acid(this.x - Math.sin(this.dir) * this.size/2, this.y + Math.cos(this.dir)*this.size/2,this.dir+i));
             }
             this.reload = -this.reloadTime;
             
@@ -394,13 +505,16 @@ function player_data(){
 var outside = new OutsideWorldBody();
 var canvas = new GameCanvasBody();
 var player = new player_data();
+var pathogen = new Pathogen(-77,25,"common-cold.png", 1,1,4,1,50);
 
 function tick(){
     outside.update();
     player.update();
+    pathogen.update();
+
     canvas.clear();
     player.draw();
-    
+    pathogen.draw();
     //mouse
     let ctx = canvas.context;
     ctx.beginPath();
