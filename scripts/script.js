@@ -186,7 +186,7 @@ function GameCanvasBody(){
         this.canvas.height = this.height;
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        let levelImage = document.getElementById("Level1-image");
+        let levelImage = document.getElementById(`Level${level}-image`);
         this.imgHeight = levelImage.height*(2000/levelImage.width);
         this.context.drawImage(levelImage,0,0,2000,this.imgHeight);
         
@@ -640,7 +640,7 @@ function tick(){
                     enemies.push(new Pathogen(stuff["spawn"]["x"],stuff["spawn"]["y"],stuff["img"],stuff["stats"]["dmg"],stuff["stats"]["health"],stuff["stats"]["speed"],stuff["stats"]["backlash"],stuff["stats"]["size"],stuff["stats"]["type"]));
                 }
             }
-            if(day >= 5){
+            if(day == 5){
                 outside.panels.info.card.img.src = levelData[level]["infoImg"];
                 outside.panels.info.card.img.alt = levelData[level]["type"];
                 outside.panels.info.card.title = levelData[level]["type"];
@@ -653,11 +653,16 @@ function tick(){
         <b>YOUR GAME IS PAUSED</b> <br>
         Level: ${level} <br>
         Day: ${day} <br>
+        Critical Infection at day: ${levelData[level]["lastday"] + 2} < br>
         Timer: ${Math.round((gameTimer + Number.EPSILON) * 100) / 100} seconds <br>
         Time until next day: ${30 - (Math.round((gameTimer + Number.EPSILON) * 100) / 100 - dayTimer)} seconds <br>
         Amount of confirmed Pathogens: ${enemies.length} <br>
         ${day>=5 ? `Pathogen Confirmed: ${levelData[level]["type"]} (see right)`:`Waiting for Pathogen type to be confirmed...`} <br>
         `
+
+        if(day >= levelData[level]["lastday"] + 2){
+            stopGame("too long");
+        }
     }else{
         const d = new Date();
         lastTime = d.getTime();
