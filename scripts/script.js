@@ -19,31 +19,31 @@ var gameTimer;
 var level = 0;
 var day = 1;
 var gameTimer =0;
-var startTime = 0;
+var lastTime = 0;
 var enemies = [];
 var dayTimer = 0;
 var levelData ={
     0:{"lastday": -1},
     1:{
         "type": "Common cold",
-        "Info": "More than 200 viruses can cause the common cold, but rhinoviruses are the most common culprits. It's highly contagious and spreads through touch, airborne droplets from coughs and sneezes, and contaminated surfaces.",
+        "info": "More than 200 viruses can cause the common cold, but rhinoviruses are the most common culprits. It's highly contagious and spreads through touch, airborne droplets from coughs and sneezes, and contaminated surfaces.",
         "infoImg": "common-cold.png",
         "img": "common-cold.png",
         "stats":{
-            "dmg": 10,
+            "dmg": 1,
             "health": 10,
             "speed": 10,
             "backlash": 1,
             "size": 10,
             "type": "calm"
         },
-        "day1": 50,
-        "day2": 50,
-        "day3": 50,
-        "day4": 50,
-        "day5": 50,
-        "day6": 50,
-        "day7": 50,
+        "day1": 25,
+        "day2": 25,
+        "day3": 25,
+        "day4": 25,
+        "day5": 25,
+        "day6": 25,
+        "day7": 25,
         "lastday": 7,
         "spawn": {
             "x": 1896.6116313200093, 
@@ -57,7 +57,7 @@ function start(){
     document.getElementById("game").style.display = "block";
     interval = setInterval(tick, 10);
     const d = new Date();
-    startTime = d.getTime();
+    lastTime = d.getTime();
 }
 
 function InfoImage(){
@@ -86,7 +86,7 @@ function OutsideWorldBody(){
 
     this.panels.info.text = document.getElementById("info-text").innerHTML;
     this.panels.info.card.title = document.getElementById("info-card-title").innerHTML;
-    this.panels.info.card.img.src = document.getElementById("info-card-img").src;
+    this.panels.info.card.img.src = "question_mark.png";
     this.panels.info.card.img.alt = document.getElementById("info-card-img").alt;
     this.panels.info.card.info = document.getElementById("info-card-info").innerHTML;
 
@@ -136,7 +136,7 @@ function OutsideWorldBody(){
         // update texts
         document.getElementById("info-text").innerHTML = this.panels.info.text;
         document.getElementById("info-card-title").innerHTML = this.panels.info.card.title;
-        document.getElementById("info-card-img").src = this.panels.info.card.img.src;
+        document.getElementById("info-card-img").src = "assets/info/" + this.panels.info.card.img.src;
         document.getElementById("info-card-img").alt = this.panels.info.card.img.alt;
         document.getElementById("info-card-info").innerHTML = this.panels.info.card.info;
 
@@ -168,7 +168,7 @@ function GameCanvasBody(){
     this.scrolly = 0;
 
 
-    //this.canvas.style.cursor = 'none';
+    this.canvas.style.cursor = 'none';
     window.addEventListener('keydown', function (e) {
         canvas.keys = (canvas.keys || []);
         canvas.keys[e.keyCode] = true;
@@ -266,30 +266,51 @@ function Pathogen(spawnx,spawny, img, dmg,health,speed,backlash,size, type = "ca
                     player.acids.splice(i, 1);
                 }
             }
+            
+            //check collisions with player
+            let dist = Math.sqrt((this.x - player.x)**2 + (this.y - player.y)**2)
+            if(dist <= this.size + player.size/2){
+                player.health -= this.dmg;
+                this.x = oldx;
+                this.y = oldy;
+                let playerDir = Math.atan2(this.x - player.x, this.y - player.y) - (2*Math.PI)/4
+                playerDir %= 2*Math.PI
+                this.sx = Math.sin(playerDir) * 10
+                this.sy= Math.cos(playerDir) * -10;
+                player.speedX += Math.sin(playerDir) * -10;
+                player.speedY += Math.cos(playerDir) * 10;
+            }
+
             if(this.health <= 0){
                 enemies.splice(enemies.indexOf(this), 1);
             }
+
             
         }
-        
     };
 
     this.draw = function(){
-        let image = document.getElementById(this.img);
+        //check if offscreen
+        if(!((this.x - canvas.scrollx < -this.size || 
+            this.x - canvas.scrollx > canvas.width + this.size) ||
+            (this.y - canvas.scrolly > canvas.height + this.size||
+            this.y - canvas.scrolly < -this.size))){
+            let image = document.getElementById(this.img);
 
-        canvas.context.save();
+            canvas.context.save();
 
-        // move to pos
-        canvas.context.translate(this.x,this.y);
+            // move to pos
+            canvas.context.translate(this.x,this.y);
 
-        //rotate image
-        canvas.context.rotate(this.dir);
+            //rotate image
+            canvas.context.rotate(this.dir);
 
-        
-        canvas.context.drawImage(image,-this.size/2,-this.size/2,this.size,this.size);
+            
+            canvas.context.drawImage(image,-this.size/2,-this.size/2,this.size,this.size);
 
-        // restore
-        canvas.context.restore();
+            // restore
+            canvas.context.restore();
+        }
     };
 
     this.checkCollisions = function(x,y){
@@ -349,10 +370,11 @@ function acid(x,y,dir, damage = 5, speed = 8) {
     };
     this.draw = function(){
         let context = canvas.context;
-        context.fillStyle = 'black';
+        context.lineWidth = 1;
+        context.fillStyle = 'yellow';
         context.beginPath();
         context.arc(this.x, this.y, this.width, 0, 2 * Math.PI, false);
-        context.fillStyle = 'black';
+        context.fillStyle = 'yellow';
         context.fill();
         context.stroke();
     };
@@ -371,6 +393,7 @@ function player_data(){
     this.acids = [];
     this.reload = 0;
     this.reloadTime = 50;
+    this.health = 100;
 
     this.update = function(){
         if(this.reload != 0){
@@ -495,6 +518,10 @@ function player_data(){
             canvas.scrolly = canvas.imgHeight - canvas.height;
         }
 
+        //Health
+        if(this.health <= 0){
+            stopGame("health");
+        }
     };
 
     this.checkCollisions = function(x,y){
@@ -532,7 +559,18 @@ function player_data(){
         // restore
         canvas.context.restore();
 
+        //draw health
+        let ctx = canvas.context;
+        ctx.strokeStyle = "green";
+        ctx.lineWidth = 10;
+        ctx.beginPath();
+        ctx.moveTo(this.x - this.size/2, this.y - this.size/2 - 20);
+        ctx.lineTo(this.x - this.size/2 + (this.health/100 * this.size), this.y - this.size/2-20);
+
+        ctx.stroke();
+
         //Draw acids;
+        ctx.strokeStyle = "yellow";
         for(let i = 0; i < this.acids.length; i++){
             this.acids[i].draw();
         }
@@ -544,57 +582,99 @@ var canvas = new GameCanvasBody();
 var player = new player_data();
 
 function tick(){
-    const d = new Date();
-    gameTimer = (d.getTime()- startTime)/1000;
-
     outside.update();
-    player.update();
-    for(let i = 0; i < enemies.length; i++){
-        enemies[i].update();
-    }
+    if(outside.openPanel == -1){
+        const d = new Date();
+        gameTimer += (d.getTime()- lastTime)/1000;
+        lastTime = d.getTime();
 
-    canvas.clear();
-    player.draw();
-    for(let i = 0; i < enemies.length; i++){
-        enemies[i].draw();
-    }
-    //mouse
-    let ctx = canvas.context;
-    ctx.beginPath();
-    ctx.moveTo(canvas.mx+canvas.scrollx, canvas.my - 50+canvas.scrolly);
-    ctx.lineTo(canvas.mx+canvas.scrollx, canvas.my + 50+canvas.scrolly);
-    ctx.moveTo(canvas.mx - 50+canvas.scrollx, canvas.my+canvas.scrolly);
-    ctx.lineTo(canvas.mx + 50+canvas.scrollx, canvas.my+canvas.scrolly);
-    ctx.stroke();
-
-    canvas.render();
-    //Gametimer
-    let nctx = canvas.canvas.getContext("2d");;
-    nctx.font = "30px Comic Sans MS";
-    nctx.fillStyle = "black";
-    let text = `Timer: ${gameTimer}`
-    nctx.fillText(text, canvas.width - nctx.measureText(text).width- 5, canvas.height - 10);
-    nctx.stroke();
-    
-    text = `Day: ${day}`
-    nctx.fillText(text, canvas.width - nctx.measureText(text).width- 5, canvas.height - 50);
-    nctx.stroke();
-
-    if(day > levelData[level]["lastday"]) {
-        level += 1;
-        let stuff = levelData[level];
-        day = 1;
-        for(let i = 0; i < stuff[`day1`];i++){
-            enemies.push(new Pathogen(stuff["spawn"]["x"],stuff["spawn"]["y"],stuff["img"],stuff["stats"]["dmg"],stuff["stats"]["health"],stuff["stats"]["speed"],stuff["stats"]["backlash"],stuff["stats"]["size"],stuff["stats"]["type"]));
+        
+        player.update();
+        for(let i = 0; i < enemies.length; i++){
+            enemies[i].update();
         }
-    }
-    if(gameTimer - dayTimer > 30){
-        day += 1;
-        dayTimer += 30
-        let stuff = levelData[level];
-        for(let i = 0; i < stuff[`day${day}`];i++){
-            enemies.push(new Pathogen(stuff["spawn"]["x"],stuff["spawn"]["y"],stuff["img"],stuff["stats"]["dmg"],stuff["stats"]["health"],stuff["stats"]["speed"],stuff["stats"]["backlash"],stuff["stats"]["size"],stuff["stats"]["type"]));
-        }
-    }
 
+        canvas.clear();
+        player.draw();
+        for(let i = 0; i < enemies.length; i++){
+            enemies[i].draw();
+        }
+        //mouse
+        let ctx = canvas.context;
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'black';
+        ctx.beginPath();
+        ctx.moveTo(canvas.mx+canvas.scrollx, canvas.my - 50+canvas.scrolly);
+        ctx.lineTo(canvas.mx+canvas.scrollx, canvas.my + 50+canvas.scrolly);
+        ctx.moveTo(canvas.mx - 50+canvas.scrollx, canvas.my+canvas.scrolly);
+        ctx.lineTo(canvas.mx + 50+canvas.scrollx, canvas.my+canvas.scrolly);
+        ctx.stroke();
+
+        canvas.render();
+        //Gametimer
+        let nctx = canvas.canvas.getContext("2d");;
+        nctx.font = "30px Comic Sans MS";
+        nctx.fillStyle = "black";
+        let text = `Timer: ${Math.round((gameTimer + Number.EPSILON) * 100) / 100}`
+        nctx.fillText(text, canvas.width - nctx.measureText(text).width- 5, canvas.height - 10);
+        nctx.stroke();
+        
+        text = `Day: ${day}`
+        nctx.fillText(text, canvas.width - nctx.measureText(text).width- 5, canvas.height - 50);
+        nctx.stroke();
+
+        if(day > levelData[level]["lastday"] && enemies.length ==0) {
+            level += 1;
+            let stuff = levelData[level];
+            day = 1;
+            for(let i = 0; i < stuff[`day1`];i++){
+                enemies.push(new Pathogen(stuff["spawn"]["x"],stuff["spawn"]["y"],stuff["img"],stuff["stats"]["dmg"],stuff["stats"]["health"],stuff["stats"]["speed"],stuff["stats"]["backlash"],stuff["stats"]["size"],stuff["stats"]["type"]));
+            }
+        }
+        if(gameTimer - dayTimer > 30){
+            day += 1;
+            dayTimer += 30
+            let stuff = levelData[level];
+            if(day <= stuff["lastday"]){
+                for(let i = 0; i < stuff[`day${day}`];i++){
+                    enemies.push(new Pathogen(stuff["spawn"]["x"],stuff["spawn"]["y"],stuff["img"],stuff["stats"]["dmg"],stuff["stats"]["health"],stuff["stats"]["speed"],stuff["stats"]["backlash"],stuff["stats"]["size"],stuff["stats"]["type"]));
+                }
+            }
+            if(day >= 5){
+                outside.panels.info.card.img.src = levelData[level]["infoImg"];
+                outside.panels.info.card.img.alt = levelData[level]["type"];
+                outside.panels.info.card.title = levelData[level]["type"];
+                outside.panels.info.card.info = levelData[level]["info"];
+                outside.openInfo();
+            }
+        }
+
+        outside.panels.info.text = `
+        <b>YOUR GAME IS PAUSED</b> <br>
+        Level: ${level} <br>
+        Day: ${day} <br>
+        Timer: ${Math.round((gameTimer + Number.EPSILON) * 100) / 100} seconds <br>
+        Time until next day: ${30 - (Math.round((gameTimer + Number.EPSILON) * 100) / 100 - dayTimer)} seconds <br>
+        Amount of confirmed Pathogens: ${enemies.length} <br>
+        ${day>=5 ? `Pathogen Confirmed: ${levelData[level]["type"]} (see right)`:`Waiting for Pathogen type to be confirmed...`} <br>
+        `
+    }else{
+        const d = new Date();
+        lastTime = d.getTime();
+    }
+}
+
+function stopGame(reason) {
+    document.getElementById("loose").style.display = "inline-block";
+    document.getElementById("loose-text").innerHTML =
+    `
+    ${reason == "health" ? "You ran out of health :(" : "The body became too sick and you passed away"} <br>
+    Level: ${level} <br>
+    Day: ${day} <br>
+    Timer: ${Math.round((gameTimer + Number.EPSILON) * 100) / 100} seconds <br>
+
+    To replay press the reload button on the top right.
+
+    `;
+    clearInterval(interval);
 }
