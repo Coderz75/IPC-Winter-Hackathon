@@ -31,12 +31,13 @@ var levelData ={
             "health": 10,
             "speed": 10,
             "backlash": 1,
-            "size": 10
+            "size": 10,
+            "type": "calm"
         },
-        "amount": 100,
+        "amount": 50,
         "spawn": {
-            "x": 964, 
-            "y": -427.2539682539682
+            "x": 1896.6116313200093, 
+            "y": 292
         }
     }
 };
@@ -211,6 +212,7 @@ function Pathogen(spawnx,spawny, img, dmg,health,speed,backlash,size, type = "ca
     this.dir = 0;
     this.dirSpeed = 0;
     this.type = type;
+    this.antiBody = false;
 
     let fimg = new Image();
     fimg.src = "assets/pathogens/"+this.img;
@@ -221,6 +223,9 @@ function Pathogen(spawnx,spawny, img, dmg,health,speed,backlash,size, type = "ca
 
     this.update =  function(){
         if(this.type == "calm"){
+            if(this.antiBody){
+                this.speed == 2;
+            }
             if(this.sx == 0){
                 this.sx = Math.floor(Math.random() * this.speed) * (Math.random() < 0.5 ? -1 : 1);
             }
@@ -241,6 +246,20 @@ function Pathogen(spawnx,spawny, img, dmg,health,speed,backlash,size, type = "ca
                 this.sx = 0;
                 this.sy = 0;
             }
+
+            //Check collisions with acid
+            for(let i = 0; i < player.acids.length; i++){
+                let acid = player.acids[i];
+                let dist = Math.sqrt((this.x - acid.x)**2 + (this.y - acid.y)**2)
+                if(dist <= this.size + acid.width){
+                    this.health -= acid.damage;
+                    player.acids.splice(i, 1);
+                }
+            }
+            if(this.health <= 0){
+                enemies.splice(enemies.indexOf(this), 1);
+            }
+            
         }
         
     };
@@ -282,7 +301,7 @@ function Pathogen(spawnx,spawny, img, dmg,health,speed,backlash,size, type = "ca
     }
 }
 
-function acid(x,y,dir, damage = 1, speed = 8) {
+function acid(x,y,dir, damage = 5, speed = 8) {
     this.x = x;
     this.y = y;
     this.dir = dir;
@@ -341,7 +360,7 @@ function player_data(){
     this.maxSpeed = 2;
     this.acids = [];
     this.reload = 0;
-    this.reloadTime = 100;
+    this.reloadTime = 50;
 
     this.update = function(){
         if(this.reload != 0){
@@ -513,7 +532,6 @@ function player_data(){
 var outside = new OutsideWorldBody();
 var canvas = new GameCanvasBody();
 var player = new player_data();
-var pathogen = new Pathogen(-77+1000,25+700,"common-cold.png", 1,1,4,1,50);
 
 function tick(){
     const d = new Date();
@@ -521,12 +539,15 @@ function tick(){
 
     outside.update();
     player.update();
-    pathogen.update();
+    for(let i = 0; i < enemies.length; i++){
+        enemies[i].update();
+    }
 
     canvas.clear();
     player.draw();
-    pathogen.draw();
-
+    for(let i = 0; i < enemies.length; i++){
+        enemies[i].draw();
+    }
     //mouse
     let ctx = canvas.context;
     ctx.beginPath();
@@ -544,5 +565,13 @@ function tick(){
     let text = `Timer: ${gameTimer}`
     nctx.fillText(text, canvas.width - nctx.measureText(text).width- 5, canvas.height - 10);
     nctx.stroke();
+    
+    if(enemies.length == 0) {
+        level += 1;
+        let stuff = levelData[level];
+        for(let i = 0; i < stuff["amount"];i++){
+            enemies.push(new Pathogen(stuff["spawn"]["x"],stuff["spawn"]["y"],stuff["img"],stuff["stats"]["dmg"],stuff["stats"]["health"],stuff["stats"]["speed"],stuff["stats"]["backlash"],stuff["stats"]["size"],stuff["stats"]["type"]));
+        }
+    }
 
 }
