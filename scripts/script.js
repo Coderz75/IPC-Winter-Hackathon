@@ -16,8 +16,10 @@ function setup(){
 
 var interval;
 var gameTimer;
-var level = 1;
-var gameTimer;
+var level = 0;
+var gameTimer =0;
+var startTime = 0;
+var enemies = [];
 var levelData ={
     1:{
         "type": "Common cold",
@@ -43,6 +45,8 @@ function start(){
     document.getElementById("welcome").style.display = "none";
     document.getElementById("game").style.display = "block";
     interval = setInterval(tick, 10);
+    const d = new Date();
+    startTime = d.getTime();
 }
 
 function InfoImage(){
@@ -133,11 +137,12 @@ function OutsideWorldBody(){
 
 function GameCanvasBody(){
     this.canvas = document.getElementById("game-canvas");
+    this.offscreenCanvas = new OffscreenCanvas(2000,1436.5079365079364);
     this.width = window.innerWidth;
     this.height = window.innerHeight;
     this.canvas.width = this.width;
     this.canvas.height = this.height;
-    this.context = this.canvas.getContext("2d",{ willReadFrequently: true });
+    this.context = this.offscreenCanvas.getContext("2d",{ willReadFrequently: true });
     this.canvas.onmousemove = updatemouse;
     this.canvas.onmousedown = mouse_click;
     this.canvas.onmouseup = mouse_up;
@@ -152,7 +157,7 @@ function GameCanvasBody(){
     this.scrolly = 0;
 
 
-    this.canvas.style.cursor = 'none';
+    //this.canvas.style.cursor = 'none';
     window.addEventListener('keydown', function (e) {
         canvas.keys = (canvas.keys || []);
         canvas.keys[e.keyCode] = true;
@@ -161,6 +166,7 @@ function GameCanvasBody(){
         canvas.keys[e.keyCode] = false;
     })
     
+
 
     this.clear = function() {
         this.width = window.innerWidth;
@@ -171,8 +177,12 @@ function GameCanvasBody(){
 
         let levelImage = document.getElementById("Level1-image");
         this.imgHeight = levelImage.height*(2000/levelImage.width);
-        canvas.context.drawImage(levelImage,-this.scrollx-2000/2,-this.scrolly-this.imgHeight/2,2000,this.imgHeight);
+        this.context.drawImage(levelImage,0,0,2000,this.imgHeight);
         
+    }
+
+    this.render = function(){
+        this.canvas.getContext("2d").drawImage(this.offscreenCanvas,-this.scrollx,-this.scrolly);
     }
 }
 function mouse_click(event){
@@ -241,7 +251,7 @@ function Pathogen(spawnx,spawny, img, dmg,health,speed,backlash,size, type = "ca
         canvas.context.save();
 
         // move to pos
-        canvas.context.translate(this.x-canvas.scrollx,this.y-canvas.scrolly);
+        canvas.context.translate(this.x,this.y);
 
         //rotate image
         canvas.context.rotate(this.dir);
@@ -258,7 +268,7 @@ function Pathogen(spawnx,spawny, img, dmg,health,speed,backlash,size, type = "ca
         for(let i = 0; i < 2*Math.PI;i+=0.05){
             let pointX = Math.round(x - Math.sin(i)*(this.size/2+1));
             let pointY = Math.round(y+ Math.cos(i)*(this.size/2+1));
-            const pointData = canvas.context.getImageData(pointX-canvas.scrollx, pointY-canvas.scrolly , 1, 1);
+            const pointData = canvas.context.getImageData(pointX, pointY , 1, 1);
             
             if(
                 pointData.data[0]>=150&&
@@ -293,7 +303,7 @@ function acid(x,y,dir, damage = 1, speed = 8) {
         for(let i = 0; i < 2*Math.PI;i+=0.1){
             let pointX = Math.round(this.x - Math.sin(i)*(this.width+1));
             let pointY = Math.round(this.y+ Math.cos(i)*(this.width+1));
-            const pointData = canvas.context.getImageData(pointX-canvas.scrollx, pointY-canvas.scrolly , 1, 1);
+            const pointData = canvas.context.getImageData(pointX, pointY, 1, 1);
             //console.log(pointData);
             if(
                 pointData.data[0]>=60&&
@@ -312,7 +322,7 @@ function acid(x,y,dir, damage = 1, speed = 8) {
         let context = canvas.context;
         context.fillStyle = 'black';
         context.beginPath();
-        context.arc(this.x-canvas.scrollx, this.y-canvas.scrolly, this.width, 0, 2 * Math.PI, false);
+        context.arc(this.x, this.y, this.width, 0, 2 * Math.PI, false);
         context.fillStyle = 'black';
         context.fill();
         context.stroke();
@@ -321,8 +331,8 @@ function acid(x,y,dir, damage = 1, speed = 8) {
 }
 
 function player_data(){
-    this.x = -900;
-    this.y = 450;
+    this.x = 100;
+    this.y = 1350;
     this.dir = 0;
     this.size = 100;
     this.speedX = 0;
@@ -427,7 +437,7 @@ function player_data(){
         if (canvas.mouseDown && this.reload == 0){
             //const pointData = canvas.context.getImageData(canvas.mx, canvas.my , 1, 1);
             //console.log(pointData);
-            console.log(`Mx: ${canvas.mx} my: ${canvas.my}; Truex: ${canvas.mx + canvas.scrollx} Truey: ${canvas.my + canvas.scrolly}`)
+            console.log(`Mx: ${canvas.mx} my: ${canvas.my}; Truex: ${canvas.mx + canvas.scrollx} my: ${canvas.my + canvas.scrolly}`)
             for(let i = -1; i < 1;i+=0.1){
                 this.acids.push(new acid(this.x - Math.sin(this.dir) * this.size/2, this.y + Math.cos(this.dir)*this.size/2,this.dir+i));
             }
@@ -445,19 +455,17 @@ function player_data(){
         canvas.scrollx += (this.x-(canvas.scrollx+canvas.width/2))/10
         canvas.scrolly += (this.y-(canvas.scrolly+canvas.height/2))/10
 
-        if(canvas.scrollx<-1000){
-            canvas.scrollx = -1000;
+        if(canvas.scrollx<0){
+            canvas.scrollx = 0;
+        }else if(canvas.scrollx >2000 - canvas.width){
+            canvas.scrollx = 2000 - canvas.width;
         }
-        if(canvas.scrolly<-canvas.imgHeight/2){
-            canvas.scrolly = -canvas.imgHeight/2;
-        }
-        if(canvas.scrollx>1000-canvas.width){
-            canvas.scrollx = 1000-canvas.width;
+        if(canvas.scrolly<0){
+            canvas.scrolly = 0;
+        }else if(canvas.scrolly > canvas.imgHeight - canvas.height){
+            canvas.scrolly = canvas.imgHeight - canvas.height;
         }
 
-        if(canvas.scrolly>canvas.imgHeight/2-canvas.height){
-            canvas.scrolly = canvas.imgHeight/2-canvas.height;
-        }
     };
 
     this.checkCollisions = function(x,y){
@@ -465,7 +473,7 @@ function player_data(){
         for(let i = 0; i < 2*Math.PI;i+=0.05){
             let pointX = Math.round(x - Math.sin(i)*(this.size/2+1));
             let pointY = Math.round(y+ Math.cos(i)*(this.size/2+1));
-            const pointData = canvas.context.getImageData(pointX-canvas.scrollx, pointY-canvas.scrolly , 1, 1);
+            const pointData = canvas.context.getImageData(pointX, pointY , 1, 1);
             
             if(
                 pointData.data[0]>=150&&
@@ -484,7 +492,7 @@ function player_data(){
         canvas.context.save();
 
         // move to pos
-        canvas.context.translate(this.x-canvas.scrollx,this.y-canvas.scrolly);
+        canvas.context.translate(this.x,this.y);
 
         //rotate image
         canvas.context.rotate(this.dir);
@@ -505,9 +513,12 @@ function player_data(){
 var outside = new OutsideWorldBody();
 var canvas = new GameCanvasBody();
 var player = new player_data();
-var pathogen = new Pathogen(-77,25,"common-cold.png", 1,1,4,1,50);
+var pathogen = new Pathogen(-77+1000,25+700,"common-cold.png", 1,1,4,1,50);
 
 function tick(){
+    const d = new Date();
+    gameTimer = (d.getTime()- startTime)/1000;
+
     outside.update();
     player.update();
     pathogen.update();
@@ -515,13 +526,23 @@ function tick(){
     canvas.clear();
     player.draw();
     pathogen.draw();
+
     //mouse
     let ctx = canvas.context;
     ctx.beginPath();
-    ctx.moveTo(canvas.mx, canvas.my - 50);
-    ctx.lineTo(canvas.mx, canvas.my + 50);
-    ctx.moveTo(canvas.mx - 50, canvas.my);
-    ctx.lineTo(canvas.mx + 50, canvas.my);
+    ctx.moveTo(canvas.mx+canvas.scrollx, canvas.my - 50+canvas.scrolly);
+    ctx.lineTo(canvas.mx+canvas.scrollx, canvas.my + 50+canvas.scrolly);
+    ctx.moveTo(canvas.mx - 50+canvas.scrollx, canvas.my+canvas.scrolly);
+    ctx.lineTo(canvas.mx + 50+canvas.scrollx, canvas.my+canvas.scrolly);
     ctx.stroke();
+
+    canvas.render();
+    //Gametimer
+    let nctx = canvas.canvas.getContext("2d");;
+    nctx.font = "30px Comic Sans MS";
+    nctx.fillStyle = "black";
+    let text = `Timer: ${gameTimer}`
+    nctx.fillText(text, canvas.width - nctx.measureText(text).width- 5, canvas.height - 10);
+    nctx.stroke();
 
 }
