@@ -17,10 +17,13 @@ function setup(){
 var interval;
 var gameTimer;
 var level = 0;
+var day = 1;
 var gameTimer =0;
 var startTime = 0;
 var enemies = [];
+var dayTimer = 0;
 var levelData ={
+    0:{"lastday": -1},
     1:{
         "type": "Common cold",
         "Info": "More than 200 viruses can cause the common cold, but rhinoviruses are the most common culprits. It's highly contagious and spreads through touch, airborne droplets from coughs and sneezes, and contaminated surfaces.",
@@ -34,7 +37,14 @@ var levelData ={
             "size": 10,
             "type": "calm"
         },
-        "amount": 50,
+        "day1": 50,
+        "day2": 50,
+        "day3": 50,
+        "day4": 50,
+        "day5": 50,
+        "day6": 50,
+        "day7": 50,
+        "lastday": 7,
         "spawn": {
             "x": 1896.6116313200093, 
             "y": 292
@@ -566,10 +576,23 @@ function tick(){
     nctx.fillText(text, canvas.width - nctx.measureText(text).width- 5, canvas.height - 10);
     nctx.stroke();
     
-    if(enemies.length == 0) {
+    text = `Day: ${day}`
+    nctx.fillText(text, canvas.width - nctx.measureText(text).width- 5, canvas.height - 50);
+    nctx.stroke();
+
+    if(day > levelData[level]["lastday"]) {
         level += 1;
         let stuff = levelData[level];
-        for(let i = 0; i < stuff["amount"];i++){
+        day = 1;
+        for(let i = 0; i < stuff[`day1`];i++){
+            enemies.push(new Pathogen(stuff["spawn"]["x"],stuff["spawn"]["y"],stuff["img"],stuff["stats"]["dmg"],stuff["stats"]["health"],stuff["stats"]["speed"],stuff["stats"]["backlash"],stuff["stats"]["size"],stuff["stats"]["type"]));
+        }
+    }
+    if(gameTimer - dayTimer > 30){
+        day += 1;
+        dayTimer += 30
+        let stuff = levelData[level];
+        for(let i = 0; i < stuff[`day${day}`];i++){
             enemies.push(new Pathogen(stuff["spawn"]["x"],stuff["spawn"]["y"],stuff["img"],stuff["stats"]["dmg"],stuff["stats"]["health"],stuff["stats"]["speed"],stuff["stats"]["backlash"],stuff["stats"]["size"],stuff["stats"]["type"]));
         }
     }
