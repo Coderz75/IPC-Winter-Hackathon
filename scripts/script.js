@@ -57,7 +57,7 @@ var levelData ={
         "img": "influenza.png",
         "stats":{
             "dmg": 5,
-            "health": 50,
+            "health": 5,
             "speed": 15,
             "backlash": 1,
             "size": 10,
@@ -66,9 +66,9 @@ var levelData ={
         "day1": 25,
         "day2": 25,
         "day3": 25,
-        "day4": 25,
+        "day4": 50,
         "day5": 25,
-        "lastday": 7,
+        "lastday": 5,
         "spawn": {
             "x": 35, 
             "y": 246
@@ -246,7 +246,7 @@ function Pathogen(spawnx,spawny, img, dmg,health,speed,backlash,size, type = "ca
     this.dir = 0;
     this.dirSpeed = 0;
     this.type = type;
-    this.antiBody = false;
+    this.antiBody = (day >= 5 ? true : false);
 
     let fimg = new Image();
     fimg.src = "assets/pathogens/"+this.img;
@@ -258,7 +258,7 @@ function Pathogen(spawnx,spawny, img, dmg,health,speed,backlash,size, type = "ca
     this.update =  function(){
         if(this.type == "calm"){
             if(this.antiBody){
-                this.speed == 2;
+                this.speed == 1;
             }
             if(this.sx == 0){
                 this.sx = Math.floor(Math.random() * this.speed) * (Math.random() < 0.5 ? -1 : 1);
@@ -319,21 +319,32 @@ function Pathogen(spawnx,spawny, img, dmg,health,speed,backlash,size, type = "ca
             this.x - canvas.scrollx > canvas.width + this.size) ||
             (this.y - canvas.scrolly > canvas.height + this.size||
             this.y - canvas.scrolly < -this.size))){
-            let image = document.getElementById(this.img);
+                let image = document.getElementById(this.img);
+                
+                canvas.context.save();
 
-            canvas.context.save();
+                // move to pos
+                canvas.context.translate(this.x,this.y);
 
-            // move to pos
-            canvas.context.translate(this.x,this.y);
+                //rotate image
+                canvas.context.rotate(this.dir);
 
-            //rotate image
-            canvas.context.rotate(this.dir);
+                
+                canvas.context.drawImage(image,-this.size/2,-this.size/2,this.size,this.size);
 
-            
-            canvas.context.drawImage(image,-this.size/2,-this.size/2,this.size,this.size);
+                // restore
+                canvas.context.restore();
 
-            // restore
-            canvas.context.restore();
+                if(this.antiBody){
+                    let ctx = canvas.context;
+                    ctx.strokeStyle = "yellow";
+                    ctx.lineWidth = 2;
+                    ctx.moveTo(this.x - this.size/2, this.y);
+                    ctx.lineTo(this.x + this.size/2, this.y);
+                    ctx.moveTo(this.x,this.y + this.size/2);
+                    ctx.lineTo(this.x, this.y - this.size/2);
+                    ctx.stroke();
+                }
         }
     };
 
@@ -684,6 +695,11 @@ function tick(){
                 outside.panels.info.card.img.alt = levelData[level]["type"];
                 outside.panels.info.card.title = levelData[level]["type"];
                 outside.panels.info.card.info = levelData[level]["info"];
+                for(let i = 0; i < enemies.length; i++) {
+                    enemies[i].antiBody = true;
+                    enemies[i].sx = 0;
+                    enemies[i].sy = 0;
+                }
                 outside.openInfo();
             }
         }
@@ -696,7 +712,7 @@ function tick(){
         Timer: ${Math.round((gameTimer + Number.EPSILON) * 100) / 100} seconds <br>
         Time until next day: ${30 - (Math.round((gameTimer + Number.EPSILON) * 100) / 100 - dayTimer)} seconds <br>
         Amount of confirmed Pathogens: ${enemies.length} <br>
-        ${day>=5 ? `Pathogen Confirmed: ${levelData[level]["type"]} (see right)`:`Waiting for Pathogen type to be confirmed...`} <br>
+        ${day>=5 ? `Pathogen Confirmed: ${levelData[level]["type"]} (see right) <br> Antibodies deployed!`:`Waiting for Pathogen type to be confirmed...`} <br>
         `
 
         if(day >= levelData[level]["lastday"] + 2){
