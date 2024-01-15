@@ -52,12 +52,12 @@ var levelData ={
     },
     2:{
         "type": "Influenza",
-        "info": "More than 200 viruses can cause the common cold, but rhinoviruses are the most common culprits. It's highly contagious and spreads through touch, airborne droplets from coughs and sneezes, and contaminated surfaces.",
+        "info": "Influenza, also commonly known as the flu, is a highly contagious respiratory illness caused by the influenza virus. It can infect the nose, throat, and lungs, and can cause mild to severe illness, and in some cases, even death. The flu is most common in the winter months, when people spend more time indoors and in close contact with each other.",
         "infoImg": "influenza.png",
         "img": "influenza.png",
         "stats":{
             "dmg": 5,
-            "health": 10,
+            "health": 50,
             "speed": 15,
             "backlash": 1,
             "size": 10,
