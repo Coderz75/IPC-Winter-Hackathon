@@ -49,6 +49,30 @@ var levelData ={
             "x": 1896.6116313200093, 
             "y": 292
         }
+    },
+    2:{
+        "type": "Influenza",
+        "info": "More than 200 viruses can cause the common cold, but rhinoviruses are the most common culprits. It's highly contagious and spreads through touch, airborne droplets from coughs and sneezes, and contaminated surfaces.",
+        "infoImg": "influenza.png",
+        "img": "influenza.png",
+        "stats":{
+            "dmg": 5,
+            "health": 10,
+            "speed": 15,
+            "backlash": 1,
+            "size": 10,
+            "type": "calm"
+        },
+        "day1": 25,
+        "day2": 25,
+        "day3": 25,
+        "day4": 25,
+        "day5": 25,
+        "lastday": 7,
+        "spawn": {
+            "x": 35, 
+            "y": 246
+        }
     }
 };
 
@@ -185,11 +209,11 @@ function GameCanvasBody(){
         this.canvas.width = this.width;
         this.canvas.height = this.height;
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        let levelImage = document.getElementById(`Level${level}-image`);
-        this.imgHeight = levelImage.height*(2000/levelImage.width);
-        this.context.drawImage(levelImage,0,0,2000,this.imgHeight);
-        
+        if(level != 0){
+            let levelImage = document.getElementById(`Level${level}-image`);
+            this.imgHeight = levelImage.height*(2000/levelImage.width);
+            this.context.drawImage(levelImage,0,0,2000,this.imgHeight);
+        }
     }
 
     this.render = function(){
@@ -625,10 +649,25 @@ function tick(){
 
         if(day > levelData[level]["lastday"] && enemies.length ==0) {
             level += 1;
-            let stuff = levelData[level];
-            day = 1;
-            for(let i = 0; i < stuff[`day1`];i++){
-                enemies.push(new Pathogen(stuff["spawn"]["x"],stuff["spawn"]["y"],stuff["img"],stuff["stats"]["dmg"],stuff["stats"]["health"],stuff["stats"]["speed"],stuff["stats"]["backlash"],stuff["stats"]["size"],stuff["stats"]["type"]));
+            player.x = 100;
+            player.y = 1150;
+            if(level in levelData){
+                let stuff = levelData[level];
+                day = 1;
+                gameTimer = 0;
+                for(let i = 0; i < stuff[`day1`];i++){
+                    enemies.push(new Pathogen(stuff["spawn"]["x"],stuff["spawn"]["y"],stuff["img"],stuff["stats"]["dmg"],stuff["stats"]["health"],stuff["stats"]["speed"],stuff["stats"]["backlash"],stuff["stats"]["size"],stuff["stats"]["type"]));
+                }
+            }else{
+                //YOU WIN!!!!
+                document.getElementById("win").style.display = "inline-block";
+                document.getElementById("win-text").innerHTML =
+                `
+                Congrats you have successfully defended the body from all threats!
+
+                To replay press the reload button on the top right.
+                `;
+                clearInterval(interval);
             }
         }
         if(gameTimer - dayTimer > 30){
@@ -653,7 +692,7 @@ function tick(){
         <b>YOUR GAME IS PAUSED</b> <br>
         Level: ${level} <br>
         Day: ${day} <br>
-        Critical Infection at day: ${levelData[level]["lastday"] + 2} < br>
+        Critical Infection at day: ${levelData[level]["lastday"] + 2} <br>
         Timer: ${Math.round((gameTimer + Number.EPSILON) * 100) / 100} seconds <br>
         Time until next day: ${30 - (Math.round((gameTimer + Number.EPSILON) * 100) / 100 - dayTimer)} seconds <br>
         Amount of confirmed Pathogens: ${enemies.length} <br>
