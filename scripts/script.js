@@ -59,9 +59,7 @@ var levelData ={
         "day3": 25,
         "day4": 25,
         "day5": 25,
-        "day6": 25,
-        "day7": 25,
-        "lastday": 7,
+        "lastday": 5,
         "spawn": {
             "x": 1896.6116313200093, 
             "y": 292
