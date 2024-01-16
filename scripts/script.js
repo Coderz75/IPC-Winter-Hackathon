@@ -846,6 +846,7 @@ function LIFELINES(){
 
     this.doImmuneBoost = function(){
         if(this.immuneBooster > 0){
+            this.immuneBooster -=1;
             player.damage *=2;
         }
     };
