@@ -39,6 +39,7 @@ var gameTimer =0;
 var lastTime = 0;
 var enemies = [];
 var dayTimer = 0;
+var numKilled = 0;
 var levelData ={
     0:{"lastday": -1},
     1:{
@@ -88,7 +89,32 @@ var levelData ={
             "x": 35, 
             "y": 246
         }
+    },
+    3:{
+        "type": "Strep",
+        "info": "Influenza, also commonly known as the flu, is a highly contagious respiratory illness caused by the influenza virus. It can infect the nose, throat, and lungs, and can cause mild to severe illness, and in some cases, even death. The flu is most common in the winter months, when people spend more time indoors and in close contact with each other.",
+        "infoImg": "streptococcus.png",
+        "img": "streptococcus.png",
+        "stats":{
+            "dmg": 10,
+            "health": 20,
+            "speed": 3,
+            "backlash": 1,
+            "size": 100,
+            "type": "calm"
+        },
+        "day1": 10,
+        "day2": 10,
+        "day3": 10,
+        "day4": 10,
+        "day5": 10,
+        "lastday": 5,
+        "spawn": {
+            "x": 35, 
+            "y": 246
+        }
     }
+    
 };
 
 function start(){
@@ -338,6 +364,7 @@ function Pathogen(spawnx,spawny, img, dmg,health,speed,backlash,size, type = "ca
 
             if(this.health <= 0){
                 enemies.splice(enemies.indexOf(this), 1);
+                numKilled += 1;
             }
 
             
@@ -911,8 +938,12 @@ function tick(){
         nctx.fillText(text, canvas.width - nctx.measureText(text).width- 5, canvas.height - 10);
         nctx.stroke();
         
-        text = `Day: ${day}`
+        text = `Pathogens Killed: ${numKilled}`;
         nctx.fillText(text, canvas.width - nctx.measureText(text).width- 5, canvas.height - 50);
+        nctx.stroke();
+
+        text = `Day: ${day}`
+        nctx.fillText(text, canvas.width - nctx.measureText(text).width- 5, canvas.height - 90);
         nctx.stroke();
 
         if(day > levelData[level]["lastday"] && enemies.length ==0) {
