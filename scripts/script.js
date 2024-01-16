@@ -57,7 +57,7 @@ var levelData ={
         "img": "influenza.png",
         "stats":{
             "dmg": 5,
-            "health": 5,
+            "health": 10,
             "speed": 15,
             "backlash": 1,
             "size": 10,
@@ -66,7 +66,7 @@ var levelData ={
         "day1": 25,
         "day2": 25,
         "day3": 25,
-        "day4": 50,
+        "day4": 25,
         "day5": 25,
         "lastday": 5,
         "spawn": {
@@ -114,8 +114,6 @@ function OutsideWorldBody(){
     this.panels.info.card.img.alt = document.getElementById("info-card-img").alt;
     this.panels.info.card.info = document.getElementById("info-card-info").innerHTML;
 
-    this.panels.lifeline.text = document.getElementById("lifeline-text").innerHTML;
-
     this.panels.help.text = document.getElementById("help-text").innerHTML;
 
     this.openInfo = function(){
@@ -157,6 +155,9 @@ function OutsideWorldBody(){
     }
 
     this.update = function(){
+        document.getElementById("antiviral").innerHTML = `(${lifelines.antiViral})`
+        document.getElementById("immuneBoost").innerHTML = `(${lifelines.immuneBooster})`
+        document.getElementById("plasma").innerHTML = `(${lifelines.plasmaInjection})`
         // update texts
         document.getElementById("info-text").innerHTML = this.panels.info.text;
         document.getElementById("info-card-title").innerHTML = this.panels.info.card.title;
@@ -164,7 +165,6 @@ function OutsideWorldBody(){
         document.getElementById("info-card-img").alt = this.panels.info.card.img.alt;
         document.getElementById("info-card-info").innerHTML = this.panels.info.card.info;
 
-        document.getElementById("lifeline-text").innerHTML = this.panels.lifeline.text;
 
         document.getElementById("help-text").innerHTML = this.panels.help.text;
     }
@@ -304,6 +304,22 @@ function Pathogen(spawnx,spawny, img, dmg,health,speed,backlash,size, type = "ca
                 player.speedX += Math.sin(playerDir) * -10;
                 player.speedY += Math.cos(playerDir) * 10;
             }
+            //check collsions with helpers
+            for(let i = 0; i < helpers.length; i++){
+                let helper = helpers[i];
+                let dist = Math.sqrt((this.x - helper.x)**2 + (this.y - helper.y)**2)
+                if(dist <= this.size + helper.size/2){
+                    helper.health -= this.dmg;
+                    this.x = oldx;
+                    this.y = oldy;
+                    let helperDir = Math.atan2(this.x - helper.x, this.y - helper.y) - (2*Math.PI)/4
+                    helperDir %= 2*Math.PI
+                    this.sx = Math.sin(helperDir) * 10
+                    this.sy= Math.cos(helperDir) * -10;
+                    helper.speedX += Math.sin(helperDir) * -10;
+                    helper.speedY += Math.cos(helperDir) * 10;
+                }
+            }
 
             if(this.health <= 0){
                 enemies.splice(enemies.indexOf(this), 1);
@@ -378,7 +394,7 @@ function acid(x,y,dir, damage = 5, speed = 8) {
     
     this.update = function(){
         this.tick += 1;
-        if(this.tick >= 100){
+        if(this.tick >= 50){
             player.acids.splice(player.acids.indexOf(this), 1);
             return;
         }
@@ -429,6 +445,7 @@ function player_data(){
     this.reload = 0;
     this.reloadTime = 50;
     this.health = 100;
+    this.damage = 5;
 
     this.update = function(){
         if(this.reload != 0){
@@ -526,7 +543,7 @@ function player_data(){
             //console.log(pointData);
             console.log(`Mx: ${canvas.mx} my: ${canvas.my}; Truex: ${canvas.mx + canvas.scrollx} my: ${canvas.my + canvas.scrolly}`)
             for(let i = -1; i < 1;i+=0.1){
-                this.acids.push(new acid(this.x - Math.sin(this.dir) * this.size/2, this.y + Math.cos(this.dir)*this.size/2,this.dir+i));
+                this.acids.push(new acid(this.x - Math.sin(this.dir) * this.size/2, this.y + Math.cos(this.dir)*this.size/2,this.dir+i,this.damage));
             }
             this.reload = -this.reloadTime;
             
@@ -611,10 +628,227 @@ function player_data(){
         }
     };
 }
+function Helper(){
+    this.x = 100;
+    this.y = 1350;
+    this.dir = 0;
+    this.size = 100;
+    this.speedX = 0;
+    this.speedY = 0;
+    this.speed = 2;
+    this.maxSpeed = 2;
+    this.acids = [];
+    this.reload = 0;
+    this.reloadTime = 50;
+    this.health = 100;
+    this.damage = 5;
+
+    this.update = function(){
+        if(this.reload != 0){
+            this.reload +=1;
+        }
+
+        //Nearest pathogen
+        let f = [];
+        for(let i = 0; i < enemies.length; i++){
+            let badGuy = enemies[i];
+            let dist = Math.sqrt((this.x - badGuy.x)**2 + (this.y - badGuy.y)**2)
+            f.push([dist,badGuy.x,badGuy.y,badGuy.size/2]);
+        }
+        f.sort(function(a,b){return a[0]-b[0]});
+
+        if(f.length > 0){
+            let thing = f[0];
+            //get dir
+            this.dir = Math.atan2(thing[2] - this.y, thing[1] - this.x) - (2*Math.PI)/4
+            this.dir %= 2*Math.PI
+            //get pos
+            if(thing[0] < 50 + this.size/2 + thing[3]){
+                //too close
+                this.speedX += Math.sin(this.dir)* 5;
+                this.speedY += Math.cos(this.dir)* -5;
+            }else{
+                //too far
+                this.speedX += Math.sin(this.dir)* -5;
+                this.speedY += Math.cos(this.dir)* 5;
+            }
+        }
+        
+
+        let oldx = this.x;
+        let oldy = this.y;
+
+        //Ai
+
+
+        this.x += this.speedX;
+        this.y += this.speedY;
+        
+        if(this.speedX > 0 ){
+            this.speedX -= 1;
+        }else if(this.speedX < 0){
+            this.speedX +=1;
+        }
+
+        if(this.speedX > this.maxSpeed){
+            this.speedX = this.maxSpeed;
+        }else if(this.speedX < -this.maxSpeed){
+            this.speedX = -this.maxSpeed;
+        }
+
+        if(this.speedY > 0 ){
+            this.speedY -= 1;
+        }else if(this.speedY < 0){
+            this.speedY +=1;
+        }
+
+        if(this.speedY > this.maxSpeed){
+            this.speedY = this.maxSpeed;
+        }else if(this.speedY < -this.maxSpeed){
+            this.speedY = -this.maxSpeed;
+        }
+        
+        
+        if(this.checkCollisions(this.x,this.y)){
+            let newX = this.x;
+            let newY = this.y;
+            
+            let match = false;
+            if(Math.abs(this.speedX) > Math.abs(this.speedY)){
+                //fidget y
+                for(let i = 1; i < 12; i++){
+                    if(!this.checkCollisions(newX,newY+i)){
+                        this.y = newY + i;
+                        match = true;
+                        break;
+                    }else if(!this.checkCollisions(newX,newY-i)){
+                        this.y = newY - i;
+                        match = true;
+                        break;
+                    }
+                }
+            }else{
+                //fidget x
+                for(let i = 1; i < 12;i++){
+                    if(!this.checkCollisions(newX+i,newY)){
+                        this.x = newX + i;
+                        match = true;
+                        break;
+                    }else if(!this.checkCollisions(newX-i,newY)){
+                        this.x = newX - i;
+                        match = true;
+                        break;
+                    }
+                }
+            }
+            if(!match){
+                this.speedX = 0;
+                this.speedY = 0;
+                this.x = oldx
+                this.y = oldy;
+            }
+        };
+        
+
+
+        //Shoot acids
+        if (this.reload == 0){
+            for(let i = -1; i < 1;i+=0.1){
+                player.acids.push(new acid(this.x - Math.sin(this.dir) * this.size/2, this.y + Math.cos(this.dir)*this.size/2,this.dir+i,this.damage));
+            }
+            this.reload = -this.reloadTime;
+        }
+
+        //Health
+        if(this.health <= 0){
+            helpers.splice(helpers.indexOf(this), 1);
+        }
+    };
+
+    this.checkCollisions = function(x,y){
+        //check collisions
+        for(let i = 0; i < 2*Math.PI;i+=0.05){
+            let pointX = Math.round(x - Math.sin(i)*(this.size/2+1));
+            let pointY = Math.round(y+ Math.cos(i)*(this.size/2+1));
+            const pointData = canvas.context.getImageData(pointX, pointY , 1, 1);
+            
+            if(
+                pointData.data[0]>=150&&
+                pointData.data[1]==0&&
+                pointData.data[2]==0
+            ){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    this.draw = function(){
+        let image = document.getElementById("charachter-image");
+
+        canvas.context.save();
+
+        // move to pos
+        canvas.context.translate(this.x,this.y);
+
+        //rotate image
+        canvas.context.rotate(this.dir);
+
+        
+        canvas.context.drawImage(image,-this.size/2,-this.size/2,this.size,this.size);
+
+        // restore
+        canvas.context.restore();
+
+        //draw health
+        let ctx = canvas.context;
+        ctx.strokeStyle = "green";
+        ctx.lineWidth = 10;
+        ctx.beginPath();
+        ctx.moveTo(this.x - this.size/2, this.y - this.size/2 - 20);
+        ctx.lineTo(this.x - this.size/2 + (this.health/100 * this.size), this.y - this.size/2-20);
+        ctx.stroke();
+
+    };
+}
+function LIFELINES(){
+    this.antiViral = 1;
+    this.immuneBooster = 1;
+    this.plasmaInjection = 1;
+
+    this.doAntiViral = function(){
+        if(this.antiViral > 0){
+            this.antiViral -=1;
+            
+            let amount = enemies.length /2;
+            for(let i = 0; i<amount; i++){
+                enemies.splice(i, 1);
+            }
+        }
+    };
+
+    this.doImmuneBoost = function(){
+        if(this.immuneBooster > 0){
+            player.damage *=2;
+        }
+    };
+
+    this.doPlasmaInjection = function(){
+        if(this.plasmaInjection > 0){
+            this.plasmaInjection -=1;
+            helpers.push(new Helper());
+        }
+    };
+
+}
+
+
 
 var outside = new OutsideWorldBody();
 var canvas = new GameCanvasBody();
 var player = new player_data();
+var lifelines = new LIFELINES();
+var helpers = [];
 
 function tick(){
     outside.update();
@@ -623,6 +857,9 @@ function tick(){
         gameTimer += (d.getTime()- lastTime)/1000;
         lastTime = d.getTime();
 
+        for(let i = 0; i< helpers.length; i++){
+            helpers[i].update();
+        }
         
         player.update();
         for(let i = 0; i < enemies.length; i++){
@@ -630,7 +867,11 @@ function tick(){
         }
 
         canvas.clear();
+        for(let i = 0; i< helpers.length; i++){
+            helpers[i].draw();
+        }
         player.draw();
+        
         for(let i = 0; i < enemies.length; i++){
             enemies[i].draw();
         }
@@ -662,10 +903,16 @@ function tick(){
             level += 1;
             player.x = 100;
             player.y = 1150;
+            for(let i = 0; i < helpers.length; i++) {
+                let helper = helpers[i];
+                helper.x = 100;
+                helper.y = 1150;
+            }
             if(level in levelData){
                 let stuff = levelData[level];
                 day = 1;
                 gameTimer = 0;
+                dayTimer = 0
                 for(let i = 0; i < stuff[`day1`];i++){
                     enemies.push(new Pathogen(stuff["spawn"]["x"],stuff["spawn"]["y"],stuff["img"],stuff["stats"]["dmg"],stuff["stats"]["health"],stuff["stats"]["speed"],stuff["stats"]["backlash"],stuff["stats"]["size"],stuff["stats"]["type"]));
                 }
@@ -699,6 +946,7 @@ function tick(){
                     enemies[i].antiBody = true;
                     enemies[i].sx = 0;
                     enemies[i].sy = 0;
+                    enemies[i].health = 1;
                 }
                 outside.openInfo();
             }
@@ -714,6 +962,8 @@ function tick(){
         Amount of confirmed Pathogens: ${enemies.length} <br>
         ${day>=5 ? `Pathogen Confirmed: ${levelData[level]["type"]} (see right) <br> Antibodies deployed!`:`Waiting for Pathogen type to be confirmed...`} <br>
         `
+
+        
 
         if(day >= levelData[level]["lastday"] + 2){
             stopGame("too long");

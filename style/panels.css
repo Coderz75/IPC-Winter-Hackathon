@@ -100,3 +100,8 @@
     margin-left: auto;
     margin-right: auto;
 }
+
+#lifeline button{
+    background-color: black;
+    color: white;
+}
