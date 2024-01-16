@@ -1,4 +1,21 @@
 "use strict";
+/*
+    Protect your host's body
+    Copyright (C) 2024  Nuaym Syed
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 
 var panelOpen = false;
 
@@ -923,7 +940,27 @@ function tick(){
                 `
                 Congrats you have successfully defended the body from all threats!
 
+                Author's Note: 
+                Remember how annoying it was to defend the body against pathogens, all while your hosts barely cares, and continues to refuse to vaccinate, follow proper hygene, and be safe. Don't be that guy. You have thousands of cells trying to protect you and keep you healthy, the least you could, and should, do is keep yourself safe by vaccinating on time (don't be an anti-vaxxer) keeping proper hygiene and conducting proper quarantine if you're sick.
+
                 To replay press the reload button on the top right.
+
+                Images are either drawn directly by me or using Adobe Firefly.
+                Protect your host's body
+                Copyright (C) 2024  Nuaym Syed
+            
+                This program is free software: you can redistribute it and/or modify
+                it under the terms of the GNU General Public License as published by
+                the Free Software Foundation, either version 3 of the License, or
+                (at your option) any later version.
+            
+                This program is distributed in the hope that it will be useful,
+                but WITHOUT ANY WARRANTY; without even the implied warranty of
+                MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+                GNU General Public License for more details.
+            
+                You should have received a copy of the GNU General Public License
+                along with this program.  If not, see <https://www.gnu.org/licenses/>.
                 `;
                 clearInterval(interval);
             }
@@ -984,7 +1021,24 @@ function stopGame(reason) {
     Timer: ${Math.round((gameTimer + Number.EPSILON) * 100) / 100} seconds <br>
 
     To replay press the reload button on the top right.
+    
 
+    Images are either drawn directly by me or using Adobe Firefly.
+    Protect your host's body
+    Copyright (C) 2024  Nuaym Syed
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
     `;
     clearInterval(interval);
 }
