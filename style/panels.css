@@ -55,6 +55,8 @@
     height: 50vh;
     font-family: "Monaco", "Courier New", monospace;
     padding: 5px;
+    overflow: scroll;
+    overflow-x: hidden;
 }
 #info-text{
     width: 40vw;
@@ -104,4 +106,14 @@
 #lifeline button{
     background-color: black;
     color: white;
+}
+
+.right{
+    float:right;
+    width:20vw;
+}
+
+.left{
+    float:left;
+    width:20vw;
 }
