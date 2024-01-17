@@ -1,2 +1,5 @@
-# IPC-Winter-Hackathon
-IPC Winter Hackathon project - will decide what to do with it lator
+# Immune Quest
+
+IPC Winter Hackathon project
+
+Play the game on [https://coderz75.github.io/IPC-Winter-Hackathon/](https://coderz75.github.io/IPC-Winter-Hackathon/)
