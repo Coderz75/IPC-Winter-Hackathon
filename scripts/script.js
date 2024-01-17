@@ -91,27 +91,27 @@ var levelData ={
         }
     },
     3:{
-        "type": "Strep",
-        "info": "Influenza, also commonly known as the flu, is a highly contagious respiratory illness caused by the influenza virus. It can infect the nose, throat, and lungs, and can cause mild to severe illness, and in some cases, even death. The flu is most common in the winter months, when people spend more time indoors and in close contact with each other.",
-        "infoImg": "streptococcus.png",
-        "img": "streptococcus.png",
+        "type": "Covid-19",
+        "info": "COVID-19, caused by the SARS-CoV-2 virus, is another highly contagious respiratory illness, though distinct from the flu. It also targets the lungs and airways, but can potentially bring a wider range of symptoms and long-term complications. While influenza peaks in winter, COVID-19 can spread year-round and mutate readily, creating new variants with varying degrees of transmissibility and severity.",
+        "infoImg": "covid.png",
+        "img": "covid.png",
         "stats":{
             "dmg": 10,
-            "health": 20,
-            "speed": 3,
+            "health": 10,
+            "speed": 12,
             "backlash": 1,
-            "size": 100,
+            "size": 10,
             "type": "calm"
         },
-        "day1": 10,
-        "day2": 10,
-        "day3": 10,
-        "day4": 10,
-        "day5": 10,
+        "day1": 25,
+        "day2": 25,
+        "day3": 25,
+        "day4": 25,
+        "day5": 25,
         "lastday": 5,
         "spawn": {
-            "x": 35, 
-            "y": 246
+            "x": 1928, 
+            "y": 92
         }
     }
     
@@ -873,6 +873,7 @@ function LIFELINES(){
         if(this.immuneBooster > 0){
             this.immuneBooster -=1;
             player.damage *=2;
+            player.health = 100;
         }
     };
 
@@ -950,12 +951,19 @@ function tick(){
             level += 1;
             player.x = 100;
             player.y = 1150;
+            player.health = 100;
             for(let i = 0; i < helpers.length; i++) {
                 let helper = helpers[i];
                 helper.x = 100;
                 helper.y = 1150;
+                helper.health = 100;
             }
             if(level in levelData){
+                if(level == 3){
+                    lifelines.antiViral = 2;
+                    lifelines.immuneBooster = 2;
+                    lifelines.plasmaInjection = 2;
+                }
                 let stuff = levelData[level];
                 day = 1;
                 gameTimer = 0;
@@ -969,28 +977,29 @@ function tick(){
                 document.getElementById("win-text").innerHTML =
                 `
                 Congrats you have successfully defended the body from all threats!
-
+                <br><br>
                 Author's Note: 
                 Remember how annoying it was to defend the body against pathogens, all while your hosts barely cares, and continues to refuse to vaccinate, follow proper hygene, and be safe. Don't be that guy. You have thousands of cells trying to protect you and keep you healthy, the least you could, and should, do is keep yourself safe by vaccinating on time (don't be an anti-vaxxer) keeping proper hygiene and conducting proper quarantine if you're sick.
-
+                <br><br>
                 To replay press the reload button on the top right.
+                <br><br>
 
-                Images are either drawn directly by me or using Adobe Firefly.
-                Protect your host's body
-                Copyright (C) 2024  Nuaym Syed
+                Images are either drawn directly by me or using Adobe Firefly.<br><br>
+                Immune quest - Protect your host's body<br><br>
+                Copyright (C) 2024  Nuaym Syed<br><br>
             
-                This program is free software: you can redistribute it and/or modify
-                it under the terms of the GNU General Public License as published by
-                the Free Software Foundation, either version 3 of the License, or
-                (at your option) any later version.
+                This program is free software: you can redistribute it and/or modify<br><br>
+                it under the terms of the GNU General Public License as published by<br><br>
+                the Free Software Foundation, either version 3 of the License, or<br><br>
+                (at your option) any later version.<br><br>
+                <br><br>
+                This program is distributed in the hope that it will be useful,<br><br>
+                but WITHOUT ANY WARRANTY; without even the implied warranty of<br><br>
+                MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the<br><br>
+                GNU General Public License for more details.<br><br>
             
-                This program is distributed in the hope that it will be useful,
-                but WITHOUT ANY WARRANTY; without even the implied warranty of
-                MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-                GNU General Public License for more details.
-            
-                You should have received a copy of the GNU General Public License
-                along with this program.  If not, see <https://www.gnu.org/licenses/>.
+                You should have received a copy of the GNU General Public License<br><br>
+                along with this program.  If not, see <https://www.gnu.org/licenses/>.<br><br>
                 `;
                 clearInterval(interval);
             }
@@ -1053,22 +1062,22 @@ function stopGame(reason) {
     To replay press the reload button on the top right.
     
 
-    Images are either drawn directly by me or using Adobe Firefly.
-    Protect your host's body
-    Copyright (C) 2024  Nuaym Syed
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+    Images are either drawn directly by me or using Adobe Firefly.<br><br>
+                Immune quest - Protect your host's body<br><br>
+                Copyright (C) 2024  Nuaym Syed<br><br>
+            
+                This program is free software: you can redistribute it and/or modify<br><br>
+                it under the terms of the GNU General Public License as published by<br><br>
+                the Free Software Foundation, either version 3 of the License, or<br><br>
+                (at your option) any later version.<br><br>
+                <br><br>
+                This program is distributed in the hope that it will be useful,<br><br>
+                but WITHOUT ANY WARRANTY; without even the implied warranty of<br><br>
+                MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the<br><br>
+                GNU General Public License for more details.<br><br>
+            
+                You should have received a copy of the GNU General Public License<br><br>
+                along with this program.  If not, see <https://www.gnu.org/licenses/>.<br><br>
     `;
     clearInterval(interval);
 }
